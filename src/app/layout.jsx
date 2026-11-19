@@ -4,6 +4,7 @@ setServers(["1.1.1.1", "8.8.8.8"]);
 
 import "./globals.css";
 import Script from "next/script";
+import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -34,7 +35,9 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
-        <Navbar></Navbar>
+        <Suspense fallback={<header className="h-20 w-full" />}>
+          <Navbar />
+        </Suspense>
         <main className="flex-1 flex flex-col">
           {children}
         </main>
