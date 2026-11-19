@@ -60,11 +60,17 @@ export default function CreateEventPage() {
     }
   }, [isPending, isLoggedIn]);
 
-  // Minimum date selectable is tomorrow per requirement (future dates only)
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split("T")[0];
-  const todayStr = new Date().toISOString().split("T")[0];
+  // Date limits computed safely in useEffect to prevent Next.js prerender error
+  const [minDate, setMinDate] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setMinDate(tomorrow.toISOString().split("T")[0]);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const validateField = (name, value) => {
     let err = "";
@@ -74,8 +80,9 @@ export default function CreateEventPage() {
     } else if (name === "eventType") {
       if (!value.trim()) err = "Please choose an event type.";
     } else if (name === "eventDate") {
+      const today = new Date().toISOString().split("T")[0];
       if (!value) err = "Event Date is required.";
-      else if (value <= todayStr) err = "Event date must be strictly in the future (after today).";
+      else if (value <= today) err = "Event date must be strictly in the future (after today).";
     } else if (name === "location") {
       if (!value.trim()) err = "Location is required.";
       else if (value.trim().length < 3) err = "Location must be at least 3 characters.";
@@ -99,9 +106,10 @@ export default function CreateEventPage() {
       errors.eventType = "Please select an event category.";
     }
 
+    const today = new Date().toISOString().split("T")[0];
     if (!formData.eventDate) {
       errors.eventDate = "Event Date is required.";
-    } else if (formData.eventDate <= todayStr) {
+    } else if (formData.eventDate <= today) {
       errors.eventDate = "Event date must be strictly in the future (no past or today).";
     }
 
@@ -378,7 +386,7 @@ export default function CreateEventPage() {
                   <input
                     type="date"
                     name="eventDate"
-                    min={tomorrowStr}
+                    min={minDate}
                     value={formData.eventDate}
                     onChange={handleChange}
                     className={`w-full px-4 py-3 bg-[#FAF8F5] dark:bg-[#202020] border rounded-xl text-sm text-[#101010] dark:text-[#F5F1E8] focus:outline-none focus:ring-2 focus:ring-[#0f766e] transition-all cursor-pointer ${

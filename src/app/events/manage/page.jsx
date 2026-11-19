@@ -76,11 +76,17 @@ export default function ManageEventsPage() {
     }
   }, [isPending, isLoggedIn]);
 
-  // Minimum date selectable is tomorrow per requirement (future dates only)
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split("T")[0];
-  const todayStr = new Date().toISOString().split("T")[0];
+  // Date limits computed safely in useEffect to prevent Next.js prerender error
+  const [minDate, setMinDate] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setMinDate(tomorrow.toISOString().split("T")[0]);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const validateEditField = (name, value) => {
     let err = "";
@@ -90,8 +96,9 @@ export default function ManageEventsPage() {
     } else if (name === "eventType") {
       if (!value.trim()) err = "Category is required.";
     } else if (name === "eventDate") {
+      const today = new Date().toISOString().split("T")[0];
       if (!value) err = "Event Date is required.";
-      else if (value <= todayStr) err = "Event date must be in the future (after today).";
+      else if (value <= today) err = "Event date must be in the future (after today).";
     } else if (name === "location") {
       if (!value.trim()) err = "Location is required.";
       else if (value.trim().length < 3) err = "Location must be at least 3 characters.";
@@ -115,10 +122,11 @@ export default function ManageEventsPage() {
       errors.eventType = "Please select an event category.";
     }
 
+    const today = new Date().toISOString().split("T")[0];
     if (!editFormData.eventDate) {
       errors.eventDate = "Event Date is required.";
-    } else if (editFormData.eventDate <= todayStr) {
-      errors.eventDate = "Event date must be strictly in the future (after today).";
+    } else if (editFormData.eventDate <= today) {
+      errors.eventDate = "Event date must be strictly in the future (no past or today).";
     }
 
     if (!editFormData.location.trim()) {
@@ -667,7 +675,7 @@ export default function ManageEventsPage() {
                   </label>
                   <input
                     type="date"
-                    min={tomorrowStr}
+                    min={minDate}
                     value={editFormData.eventDate}
                     onChange={(e) => {
                       const val = e.target.value;
