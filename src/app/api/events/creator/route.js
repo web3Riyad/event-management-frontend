@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, connection } from "next/server";
 import { MongoClient } from "mongodb";
 import { extractAndVerifyJwt } from "@/lib/jwt";
 
@@ -13,6 +13,7 @@ if (!global._mongoClientPromise && uri) {
 clientPromise = global._mongoClientPromise;
 
 export async function GET(request) {
+  await connection();
   try {
     const authUser = extractAndVerifyJwt(request);
     const { searchParams } = new URL(request.url);
