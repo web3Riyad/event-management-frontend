@@ -14,9 +14,9 @@ export async function getJwtToken(user) {
         const payload = JSON.parse(atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/")));
         if (payload.exp && payload.exp > Math.floor(Date.now() / 1000) + 60) {
           console.log("%c=======================================================", "color: #10b981; font-weight: bold;");
-          console.log("%c🔑 [JWT TOKEN (Copy below)]:", "color: #10b981; font-weight: bold; font-size: 14px;");
+          console.log("%c [JWT TOKEN (Copy below)]:", "color: #10b981; font-weight: bold; font-size: 14px;");
           console.log(token);
-          console.log("%c✅ [VERIFIED PAYLOAD]:", "color: #0ea5e9; font-weight: bold; font-size: 12px;", payload);
+          console.log("%c [VERIFIED PAYLOAD]:", "color: #0ea5e9; font-weight: bold; font-size: 12px;", payload);
           console.log("%c=======================================================", "color: #10b981; font-weight: bold;");
           return token;
         }

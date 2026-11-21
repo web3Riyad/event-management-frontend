@@ -205,7 +205,7 @@ export default function SignUpPage() {
       setToastMessage("Account created successfully! Welcome to UNIQUE.");
 
       setTimeout(() => {
-        router.push("/login");
+        router.push("/");
         router.refresh();
       }, 1200);
     } catch (err) {
