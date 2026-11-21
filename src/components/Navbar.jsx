@@ -83,6 +83,15 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Log active JWT token for developer convenience
+  useEffect(() => {
+    if (session?.user) {
+      import("@/lib/jwt-client").then(({ getJwtToken }) => {
+        getJwtToken(session.user);
+      });
+    }
+  }, [session?.user]);
+
   const handleLogout = async () => {
     try {
       await signOut();

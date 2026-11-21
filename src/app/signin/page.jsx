@@ -95,6 +95,13 @@ export default function LoginPage() {
 
       setToastMessage("Login successful! Welcome back.");
 
+      try {
+        const { getJwtToken } = await import("@/lib/jwt-client");
+        await getJwtToken({ email: trimmedEmail });
+      } catch (tokenErr) {
+        console.warn("Could not fetch JWT token:", tokenErr);
+      }
+
       setTimeout(() => {
         router.push(redirectPath);
         router.refresh();
